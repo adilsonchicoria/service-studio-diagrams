@@ -1,0 +1,48 @@
+@startuml
+!include UMLBaseSettings.puml
+
+package OutSystems.GuidedTour.Framework.Model as FrameworkModel{       
+    interface IGuidedTour {
+        +IGuidedTourStep[] Steps
+        +bool CanGoBackInSteps 
+        +bool IsDialogAlwaysOnTop 
+        +bool IsDialogSticky 
+        +bool ShowOnCloseConfirmationDialog 
+    }
+    IGuidedTourStep <.. IGuidedTour
+        
+    interface IGuidedTourAction {
+        +object ActionParameters 
+        +bool Execute()
+    }
+
+    interface IGuidedTourActionsManager {
+        +InvokeInnerAction(StepAction action, object parameters);
+    }
+    
+    interface IGuidedTourStep {
+        +object CreateStepView()
+        +IStepCompletionActionResult ExecuteStepCompletionAction()
+        +GuidedTourStepTarget GuidedTourPointer
+        +GuidedTourDialogPosition DialogPosition
+        +bool IsAutoAdvanceStep    
+        +string GetValidationForStartingStep()
+        +string GetValidationForEndingStep()
+    }
+
+    
+    interface IGuidedTourUserEvent {
+        +GuidedTourUserInteractionType InteractionType
+        +public GuidedTourUIEventType UIEventType
+        +string InteractionArea
+        +string TargetType
+        +string Label
+        +string Context
+        +double Keycode
+        +bool CtrlDown
+        +bool AltDown
+        +bool ShiftDown
+        +bool MetaDown
+    }  
+}
+@enduml

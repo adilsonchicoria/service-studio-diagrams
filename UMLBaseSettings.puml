@@ -1,0 +1,6 @@
+@startuml
+'!theme plain
+'!theme blueprint
+skinparam monochrome false
+
+@enduml

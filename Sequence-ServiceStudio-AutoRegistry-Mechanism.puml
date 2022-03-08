@@ -1,0 +1,68 @@
+@startuml
+
+Title "<b>Service Studio</b> - Providers and Plugins AutoRegistry Mechanism 11/17/2021"
+
+box ServiceStudio
+participant Runtime.Runtime
+end box
+
+box ServiceStudio.Common
+participant AssemblyLoader
+end box 
+
+box "ServiceStudio.Framework" 
+participant AutoRegistryType.Loader
+participant TypeLoader
+end box 
+
+box "ServiceStudio.PluginAPI" 
+participant PluginProvider
+end box 
+
+box Plugins
+participant Plugin
+end box
+'===== Load the main assemblies
+== Load the main assemblies and Types ==
+note right Runtime.Runtime 
+ assembliesNamesToLoad => { "ServiceStudio.BuiltInBehaviors", "ServiceStudio.Presenter",
+                            "OutSystems.Model.Implementation.Applications", "OutSystems.Model.Implementation.Keys" , 
+                            "ServiceStudio.GuidedTourFramework" //added by HybridImplementation}
+end note
+Runtime.Runtime -> Runtime.Runtime: LoadAssemblies(assembliesNamesToLoad)
+activate Runtime.Runtime
+loop for each AssembliesToLoad 
+    Runtime.Runtime -> AssemblyLoader : Load(assembly)
+end
+AssemblyLoader --> Runtime.Runtime : assemblies
+
+'===== Init the main assemblies
+Runtime.Runtime -> AutoRegistryType.Loader : Init(assemblies)
+loop for each LoadedAssemblies 
+    AutoRegistryType.Loader -> TypeLoader : DiscoverTypesInAssembly(asm, typeof(AutoRegistryType))
+    TypeLoader -> TypeLoader : RuntimeHelpers.RunClassConstructor(type.TypeHandle)
+end
+== Load Plugin Assemblies and Types ==
+Runtime.Runtime -> PluginProvider : LoadAssemblies(LoadAssembly, e => Instance.LogException(e));
+activate PluginProvider
+PluginProvider --> Runtime.Runtime : pluginAssemblies
+deactivate PluginProvider
+loop for each pluginAssemblies
+    Runtime.Runtime -> TypeLoader : DiscoverTypesInAssembly(assembly, PluginProvider.DiscoverableType);
+    note right
+        Discover the Plugin assemblies <b>PluginProvider.DiscoverableType</b>
+    end note 
+    TypeLoader -> TypeLoader : RuntimeHelpers.RunClassConstructor(pluginType.TypeHandle)    
+    activate TypeLoader   
+    create Plugin
+    TypeLoader -> Plugin : new()
+    activate Plugin
+    Plugin -> PluginProvider : RegisterPlugin(this)
+    note over PluginProvider
+        Call the constructor for each <b>Plugin</b> registered on PluginProvider.
+        
+        Once registered Service Studio can access all the Plugins Providers through PluginProvider getters.
+    end note 
+end
+
+@enduml

@@ -1,0 +1,139 @@
+@startuml
+
+'!include UMLBaseSettings.puml
+Title "Loading the Tutorial Framework Infrastructure v11/17/2021"
+
+actor "Tutorial User" as TutorialUser
+
+box "ServiceStudio\n.Framework" 
+    participant Runtime 
+    participant AutoRegistryMechanism
+end box 
+
+box ServiceStudio.\nPresenter.GuidedTour 
+    participant GuidedTourController  as  GuidedTourControllerPresenter <<Presenter>>
+    participant GuidedTourProvider as  GuidedTourProvider <<Presenter>>
+end box
+
+
+box ServiceStudio.\nGuidedTourFramework  <<Controller>>
+    participant GuidedTourControllerProvider <<GuidedTourFramework>>
+    participant GuidedTourController <<GuidedTourFramework>>
+    participant ModelEventTracker
+    participant GuidedTourSession
+end box
+
+
+box ServiceStudio.\nFramework.DependencyInjection 
+    participant AutoRegistryDependency
+end box
+
+box "ServiceStudio.PluginAPI" 
+    participant PluginProvider
+end box 
+
+box "ServiceStudio.Plugin.GuidedTours" 
+    participant BuildAnAppIn5MinsWalktorialOperator <<GuidedTourOperator>>
+    participant BuildAnAppIn5MinsWalktorial <<IGuidedTour>>
+end box
+
+
+
+== The User Starts Service Studio - Loading the Infrastructure ==
+TutorialUser -> Runtime : run() "Starts Service Studio"
+
+Runtime -> AutoRegistryMechanism :  load and init assemblies
+activate AutoRegistryMechanism 
+create GuidedTourControllerProvider
+AutoRegistryMechanism -> GuidedTourControllerProvider : 
+GuidedTourControllerProvider -> AutoRegistryDependency : Of<<b>IGuidedTourController</b>,<b>GuidedTourControllerProvider</b>> 
+activate AutoRegistryDependency 
+AutoRegistryDependency -> AutoRegistryDependency : Register<<b>IGuidedTourController</b>,<b>GuidedTourControllerProvider</b>> 
+note right GuidedTourControllerProvider
+    It registering in the <b>Providers</b> dictionary 
+    the key=ServiceStudio.Presenter.GuidedTour.IGuidedTourController     
+    for the provider  
+    ServiceStudio.GuidedTourFramework.Controller.GuidedTourControllerProvider
+end note 
+AutoRegistryDependency --> AutoRegistryMechanism
+deactivate AutoRegistryDependency 
+deactivate AutoRegistryMechanism 
+
+Runtime -> AutoRegistryMechanism: load \nplugins assemlies
+activate AutoRegistryMechanism 
+create BuildAnAppIn5MinsWalktorialOperator
+AutoRegistryMechanism -> BuildAnAppIn5MinsWalktorialOperator : new 
+activate BuildAnAppIn5MinsWalktorialOperator
+BuildAnAppIn5MinsWalktorialOperator -> PluginProvider : <<static>> RegisterGuidedTourOperator(this)
+activate PluginProvider
+PluginProvider -> PluginProvider : Storage.\nGuidedTourOperators\n[guidedTourOperator.GuidedTourType] \n = guidedTourOperator;
+note over PluginProvider
+    A instance of the GuiderTourOperator 
+    <b>GuidedTourType.BuildAnAppIn5MinsWalktorial</b> 
+    will be add to the GuidedTourOperator dictionary Storage.
+end note
+deactivate BuildAnAppIn5MinsWalktorialOperator
+PluginProvider --> AutoRegistryMechanism
+deactivate PluginProvider
+
+
+newpage "Starting a Tutorial v17/11/2021"
+
+== User starts a Tutorial == 
+TutorialUser -> Runtime : "Help > Build an App in 5 min tutorial"
+
+create GuidedTourControllerPresenter
+Runtime -> GuidedTourControllerPresenter: <<static>> Instance
+activate GuidedTourControllerPresenter
+GuidedTourControllerPresenter -> AutoRegistryDependency : Get<IGuidedTourController>()?.FirstOrDefault()
+activate AutoRegistryDependency
+AutoRegistryDependency --> GuidedTourControllerPresenter : return GuidedTourControllerProvider instance
+deactivate AutoRegistryDependency
+deactivate GuidedTourControllerPresenter
+
+Runtime -> GuidedTourControllerPresenter : <<static>> <b>StartGuidedTour</b>(\ntopLevelPresenter, \nGuidedTourType.BuildAnAppIn5MinsWalktorial)
+activate GuidedTourControllerPresenter
+GuidedTourControllerPresenter -> GuidedTourControllerProvider :  <<static>> <b>StartGuidedTour</b>(\ntopLevelPresenter, \nGuidedTourType.BuildAnAppIn5MinsWalktorial)
+create GuidedTourController
+GuidedTourControllerProvider -> GuidedTourController :  Instance()
+activate GuidedTourController
+create ModelEventTracker
+GuidedTourController -> ModelEventTracker : initialize()
+deactivate GuidedTourController
+GuidedTourControllerProvider -> GuidedTourController :  <<static>> <b>StartGuidedTour</b>(\ntopLevelPresenter, \nGuidedTourType.BuildAnAppIn5MinsWalktorial)
+activate GuidedTourController
+GuidedTourController -> PluginProvider : GetGuidedTourOperator(guidedTourType)
+PluginProvider --> GuidedTourController: guidedTourOperator(instance=BuildAnAppIn5MinWalktorialOperatior)
+GuidedTourController -> BuildAnAppIn5MinsWalktorialOperator : guidedTourOperator.CreateGuidedTour()
+activate BuildAnAppIn5MinsWalktorialOperator
+BuildAnAppIn5MinsWalktorialOperator -> BuildAnAppIn5MinsWalktorialOperator : CreateGuidedTour()
+create BuildAnAppIn5MinsWalktorial
+BuildAnAppIn5MinsWalktorialOperator -> BuildAnAppIn5MinsWalktorial : guidedTour = new
+BuildAnAppIn5MinsWalktorialOperator -->  GuidedTourController : return guidedTour
+deactivate BuildAnAppIn5MinsWalktorialOperator
+create GuidedTourSession
+GuidedTourController -> GuidedTourSession : new <b>GuidedTourSession</b>(\nselectedAggregatorTopLevelPresenter, \nguidedTour, \nguidedTourType)
+activate GuidedTourSession
+GuidedTourSession -> GuidedTourSession : CurrentStep
+GuidedTourSession -> BuildAnAppIn5MinsWalktorial : 
+activate BuildAnAppIn5MinsWalktorial
+
+activate GuidedTourSession
+GuidedTourController -> GuidedTourSession : GetEligibleStepStartingValidation(guidedTourSession.CurrentStep)
+'note over GuidedTourSession
+'    First step validation ??
+'end note 
+GuidedTourController -> GuidedTourController : <b>DisplayGuidedTour(guidedTourSession)</b>
+note over GuidedTourController
+     Creates (IGuidedTourDialogPresenter Presenter, IDialogView DialogView, IGuidedTourView View)
+     and assign to the references inside the guidedTourSession as
+     guidedTourSession.GuidedTourDialogPresenter, guidedTourSession.GuidedTourView     
+end note 
+activate GuidedTourController
+create GuidedTourProvider
+GuidedTourController -> GuidedTourProvider : <<static>> CreateGuidedTourDialog(\nguidedTourSession,\n
+activate GuidedTourProvider
+GuidedTourProvider -> GuidedTourProvider : SetupAndLoadGuidedTour<b>View</b>(guidedTourSession)
+GuidedTourProvider -> GuidedTourProvider : SetupAndLoadGuidedTour<b>Dialog</b>(guidedTourSession)
+
+@enduml

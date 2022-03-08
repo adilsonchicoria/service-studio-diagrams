@@ -1,0 +1,54 @@
+@startuml
+'https://plantuml.com/use-case-diagram
+
+rectangle "Learning Outsystems Platform" {
+    actor "OS Developer" as OSDeveloper
+    note top 
+    A current OS developer running
+    a tutorial after clicked on 
+    "Learn how to use Accelerators" 
+    on the service studio News.
+    end note
+    
+    actor "Service Studio Learner" as Learner
+    note left 
+    Any Service Studio user running
+    a tutorial
+    end note
+    
+    actor Prospect 
+    note top 
+    A potential client evaluating
+    Service Studio and OS Platform.
+    end note
+
+    Learner -up-|> Prospect
+    Learner -up-|> OSDeveloper
+    
+    Learner --> (Execute a Tutorial to Learn \nhow to build apps using Service Studio)  
+}
+
+rectangle "Creating and Maintaining Tutorials" {
+    actor "Tutorial Developer" as TutorialDeveloper
+    note bottom 
+    + Creates a GuidedTour(Tutorial) inside 
+    the GuidedTour service plugin. 
+    +  Creates the GuidedTour Steps with C# Code and React
+    following the pattern defined on GuidedTour.Framework.
+    end note
+    
+    actor "Outsystems Engineer" as OutsystemsEngineer
+    note top 
+    + Software Engineer working on Service Studio
+    source code.  
+    + Knows c#, javascript, typescript, react
+    and is very thoughtful with emotive builds.
+    end note
+    
+    TutorialDeveloper -up-|> OutsystemsEngineer
+    TutorialDeveloper ->  (Create and Mantain Tutorials[Guided Tours])
+} 
+
+
+
+@enduml

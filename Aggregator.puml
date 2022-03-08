@@ -1,0 +1,97 @@
+@startuml
+'https://plantuml.com/class-diagram
+skinparam linetype ortho
+
+abstract AbstractPresenter extends IPresenter, IDisposable, ITransaction {
+    + IPresenter IPresenter.ParentPresenter
+    + ITopLevelPresenter TopLevelPresenter
+}
+interface IAggregatorWindow
+
+rectangle "X-IDE"{
+class AggregatorWindowPresenter <<main window>> <<avalonia>> extends AbstractPresenter implements IAggregatorWindow
+
+interface ITopLevelPresenter
+interface IAggregrator <<tab>> 
+interface IServerPagePresenter <<application list - fixed tab >> 
+interface IOutystemsBrowser <<forge tab - fixed>> 
+
+
+AggregatorWindowPresenter ---> "1" IServerPagePresenter : serverPagePresenter
+AggregatorWindowPresenter ---> "1" IOutystemsBrowser : outSystemsBrowserPresenter
+AggregatorWindowPresenter -right-> "0..many" IAggregrator : aggregators
+
+IServerPagePresenter -|> ITopLevelPresenter
+IOutystemsBrowser ---|> ITopLevelPresenter
+IAggregrator ---|> ITopLevelPresenter
+
+}
+
+rectangle "Legacy"{
+class RuntimeImplementation {
+    # Dictionary<IAggregatorWindowView, IAggregatorWindow> aggregatorWindows
+    # Dictionary<IAggregatorView, IAggregatorPresenter> aggregators
+    ----
+    + IEnumerable<IAggregatorPresenter> <b>Aggregators() </b>{get}
+    + IEnumerable<IAggregatorWindow> <b>AggregatorWindows()</b> {get}
+    + public virtual IEnumerable<ITopLevelPresenter> <b>GetAllTopLevelPresenters()</b>
+    --- Aggregator Window ---
+    <<internal>> void AddAggregatorWindow(IAggregatorWindow aggregatorWindow)
+    <<internal>>void RemoveAggregatorWindow(IAggregatorWindow aggregatorWindow) 
+    <<internal>> IAggregatorPresenter GetAggregator(IAggregatorView aggregatorView)
+    --- Aggregator ---
+    void AddAggregator(IAggregatorPresenter aggregator)
+}
+note right
+    The Aggregators list and te AggregatorWindow list 
+    are kept here.
+end note
+
+class AggregatorWindowPresenterLegacy extends AbstractPresenter implements IAggregatorWindow {
+    + IServerPagePresenter ServerPagePresenter //returns the 2nd aggregrator from the list 
+}
+
+note right
+    The AggregatorWindowPresenterLegacy creates 
+    two aggregator presenter by default:
+    1- The Forge (tab) Aggregator
+    2- The Server PAge (tab) Aggregator
+end note
+AggregatorWindowPresenterLegacy --> "ForgePage" AggregatorLegacyPresenter : new  
+AggregatorWindowPresenterLegacy --> "ServerPage" AggregatorLegacyPresenter : new  
+ 
+
+class AggregatorLegacyPresenter
+}
+AggregatorLegacyPresenter --> RuntimeImplementation : AddAggregator(this)
+@enduml
+
+@startuml
+
+title "Opening the Main Window (AggregatorWindowPresenter)"
+participant RuntimeImplementation
+participant HybridRuntimeImplementation
+participant AggregatorWindowPresenter <<IAggregatorWindow>>
+
+activate RuntimeImplementation
+RuntimeImplementation -> RuntimeImplementation : <b>window</b> <<IAggregatorWindow>>= ShowNewAggregatorWindow
+activate RuntimeImplementation
+    RuntimeImplementation -> RuntimeImplementation : CreateAggregatorWindow(IAggregatorWindowView view) 
+    activate RuntimeImplementation
+   
+    RuntimeImplementation -> ViewImplementationProvider.Instance : aggregatorWindowView = CreateAggregatorWindow(IAggregatorWindowView view)   
+    activate ViewImplementationProvider.Instance  
+    ViewImplementationProvider.Instance --> RuntimeImplementation : aggregatorWindowView
+    deactivate ViewImplementationProvider.Instance
+    
+    RuntimeImplementation ->  HybridRuntimeImplementation : CreateAggregatorWindow(aggregatorWindowView)   
+    activate HybridRuntimeImplementation
+    create AggregatorWindowPresenter
+    HybridRuntimeImplementation -> AggregatorWindowPresenter : aggregatorWindowPresenter = new AggregatorWindowPresenter( <b>aggregatorWindowView</b>)  
+    HybridRuntimeImplementation --> RuntimeImplementation  : aggregatorWindowPresenter     
+
+deactivate RuntimeImplementation
+RuntimeImplementation -> RuntimeImplementation : <b>window</b> <<IAggregatorWindow>>.Show();
+
+@enduml
+

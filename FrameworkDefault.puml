@@ -1,0 +1,91 @@
+@startuml
+!include UMLBaseSettings.puml
+
+package OutSystems.GuidedTour.Framework as defaultFramework {    
+             
+    enum GuidedTourUIEventType {
+        ContextMenuOpened
+        WindowOpened
+        WindowClosed
+        Show
+        Hide
+    }  
+    
+    enum GuidedTourUserInteractionType {
+        None,
+        LeftClick,
+        RightClick,
+        DoubleClick,
+        KeyPress,
+        Scroll,
+        DragDrop,
+        TextInput
+    }
+    
+    class GuidedTourPointer {
+        +double PointerPositionTopOffset
+        +double PointerPositionLeftOffset
+        +GuidedTourPointer PointerInfo
+    }
+    enum  GuidedTourPointerType{
+        None,
+        CoachMarkDialogPointer,
+        CoachMarkFloatingPointer
+    }
+    enum GuidedTourPointerPosition {
+        None,
+        TopLeft,
+        Top,
+        TopRight,
+        RightTop,
+        Right,
+        RightBottom,
+        LeftTop,
+        Left,
+        LeftBottom,
+        BottomLeft,
+        Bottom,
+        BottomRight
+    }
+    
+    enum GuidedTourDialogPosition {
+        None,
+        TopRight,
+        BottomRight,
+        BottomLeft,
+        TopLeft,
+        Center
+    }
+    
+    class GuidedTourStepTarget {
+        +string ElementPath 
+        +string ElementName
+        +GuidedTourPointer PointerInfo
+    }
+
+    abstract GuidedTourStep {
+        +<<abstract>> object CreateStepView() ;
+        +<<virtual>> IStepCompletionActionResult ExecuteStepCompletionAction()  => null;
+        +<<virtual>> GuidedTourStepTarget GuidedTourPointer
+        +<<virtual>> GuidedTourDialogPosition DialogPosition => GuidedTourDialogPosition.Center;
+        +<<virtual>> bool IsAutoAdvanceStep    
+        +<<virtual>> string GetValidationForStartingStep() => null;
+        +<<virtual>> string GetValidationForEndingStep() => null;
+    }
+    
+    enum GuidedTourType #yellow{
+        SampleAppsWalkthrough
+        CoachMark
+        MockedGuidedTour
+        BuildAnAppIn5MinsWalktorial
+    }    
+    
+    class GuidedTourUserEvent 
+    GuidedTourUserEvent ..|> IGuidedTourUserEvent
+    GuidedTourStepTarget ...> GuidedTourPointer
+    GuidedTourPointerType ..+ GuidedTourPointer 
+    GuidedTourPointerPosition ..+ GuidedTourPointer 
+    GuidedTourStep ..> GuidedTourDialogPosition 
+
+}
+@enduml

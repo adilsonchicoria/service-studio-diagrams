@@ -1,0 +1,36 @@
+@startuml
+'https://plantuml.com/class-diagram
+'nx console to help pre build tooling targets
+
+box Client
+
+participant ApplicationView
+participant WorkspaceView
+
+'local service functinalitty about client funcionallities
+'navigation
+'selection
+'view services - user feedback services
+
+'remote-services fetching mode, clipboard
+'mirror server side services
+participant ViewController <<BaseController>>
+participant View 
+participant ClientService <<generated>>
+end box
+
+box Server
+participant MetaDataServices
+participant ModelServices
+
+participant WorkspaceSessions
+
+participant ViewModel
+end box
+
+
+box PhoenixServices
+participant PhoenixServices
+end box
+
+@enduml

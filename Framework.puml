@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/class-diagram
+left to right direction
+!include FrameworkModel.puml
+!include FrameworkActions.puml
+'!include FrameworkDefault.puml
+
+'Actions dependency on Model
+AbstractGuidedTourAction .up.|> IGuidedTourAction
+    
+'Model dependency on Actions
+IGuidedTourActionsManager .> StepAction  
+
+'Model dependency on default package
+'IGuidedTourUserEvent -up-> GuidedTourUserInteractionType
+'IGuidedTourUserEvent -up-> GuidedTourUIEventType
+'    
+''default package dependency on Model    
+'GuidedTourStep ..|> IGuidedTourStep  
+'GuidedTourUserEvent ..|> IGuidedTourUserEvent
+'GuidedTourStepTarget <.. IGuidedTourStep
+'GuidedTourDialogPosition <.. IGuidedTourStep
+
+@enduml

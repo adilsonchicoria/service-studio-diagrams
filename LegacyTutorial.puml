@@ -1,0 +1,144 @@
+@startuml
+!include UMLBaseSettings.puml
+Title "Legacy Tutorial Model <DRAFT> "
+class Tutorial {
+    preparation()
+    validate()
+}
+
+class Task {
+    preparation()
+    validate()
+}
+
+class SubTask {
+    validate()
+}
+class ValidationFlow 
+class Validation
+class BuiltInFunction
+note left: Here we create code\n to interact with Service studio \n(On Hybrid we can access SS )
+class Pointer
+
+Tutorial  *-right- "1..*" Task
+Task  *-- "1..*" SubTask
+Task -right---> "0..1" ValidationFlow
+SubTask -right---> "0..1" ValidationFlow
+ValidationFlow ..> "1..*" Validation
+ValidationFlow ..> "1..*" Pointer
+Validation ..> "0..*" BuiltInFunction
+
+@enduml
+
+
+@startuml
+'!theme blueprint
+
+Title "Legacy Tutorial running model (Loop) <DRAFT> "
+start
+
+:Tutorial.preparation();
+while (!Tutorial.nextTask())
+  :task.preparation();
+  if (!task.validate()) then
+      while (!task.nextSubTask())
+        :subTask.validate();
+       endwhile   
+  endif
+endwhile
+
+
+stop
+
+@enduml
+
+@startuml
+'!theme blueprint
+!pragma horizontalLineBetweenDifferentPackageAllowed
+
+skinparam linetype polyline
+
+Title "Sauce Tutorial Steps <<IN PROGRESS>>"
+|Step 0|
+start
+:Tutorial.start();->
+|Step: Create your app|
+partition "Step: Create your app" {
+partition "before" {
+:        << action >> \nOpen Application Wizard;
+}
+if (        <<validation>> \n("App Name Input" is empty) \n) then (yes)
+    :Set the pointer to "Name input in Application Wizard"; 
+endif 
+if (                <<validation>>   \n(app.isOpened && app."Current App Name" != empty ) \n) then (true)
+else
+ : error;
+ end
+endif 
+    :Set the pointer to "Next step button"; 
+partition "after" {
+    :        << action >> \nCreate and Open Module;
+}
+} 
+|Step : Create Screen|
+partition "Step : Create Screen" {
+partition "before" {
+if ( <<validation>> \n("Is Module  Opened") \n) then (true)
+else 
+    :error;
+    end 
+endif 
+:  << action>> \nOpen New Screen dialog;
+}
+if ( <<validation>>\n(Is the right template category selected) \n) then  (false)
+    :<<pointer>>\nSet the pointer to "screen template category All"; 
+endif 
+if (        <<validation>>     \n("Empty screen template" is selected) \n) then (false)
+    :<<pointer>>\nSet the pointer to \n"Empty screen template"; 
+endif 
+    :<<pointer>>\nSet the pointer to "Create screen button"; 
+partition "after" {    
+    : << action >> \nCreate screen ;
+}
+}
+
+|Step : Drag the Accelerators|
+partition "Step : Drag the Accelerators" {
+partition "before" {
+if ( <<validation>> \n("the Module Has Screen") \n) then (true)
+else 
+    :error;
+    end 
+endif 
+}
+partition "1st accelerator" { 
+if ( <<validation>>\n(Is the 1st accelerator(CheckBalance) \nwidget container in the screen) \n) then  (false)
+    :<<pointer>>\nSet the pointer to "1st accelerator \nwidget container"(CheckBalance) in the toolbox; 
+endif 
+while (1st accelerator(CheckBalance) is being dragged)
+ :<<pointer>>\nSet the pointer to "1st accelerator \nwidget container"(CheckBalance)\n target area inside the screen;
+endwhile
+}
+
+partition "2nd accelerator" { 
+if ( <<validation>>\n(Is the 2nd accelerator(Transactions) \nwidget container in the screen) \n) then  (false)
+    :<<pointer>>\nSet the pointer to "2st accelerator \nwidget container"(Transactions) in the toolbox; 
+endif 
+while (2st accelerator(Transaction) is being dragged)
+ :<<pointer>>\nSet the pointer to "2nd accelerator \nwidget container"(Transactions)\n target area inside the screen;
+endwhile
+}
+    :<<pointer>>\nSet the pointer to "Create screen button"; 
+partition "after" {    
+    : << action >> \nCreate screen ;
+}
+}
+
+|Step 4|
+|Step 5|
+
+
+stop
+
+@enduml
+

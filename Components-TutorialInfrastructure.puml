@@ -1,0 +1,32 @@
+@startuml
+
+'!include UMLBaseSettings.puml
+skinparam linetype ortho
+title "Guided Tour Components v.11/17/2021"
+rectangle "Tutorial Infrastructure"{
+component ServiceStudio.Presenter.GuidedTour <<Presenter>> as GuidedTourPresenter 
+component ServiceStudio.View <<View>> as View 
+component Outsystem.GuidedTour.Framework <<nuget>> as Framework
+component ServideStudio.GuidedTourFramework <<Tutorial Controller>> as GuidedTourController 
+component ServiceStudio.ViewImplementation.Framework <<ViewImplementation>> as ViewImplementationFramework {
+    control UserEventTracker
+}
+component PluginAPI.GuidedTour <<service studio>> as PluginAPIGuidedTour
+component ServiceStudio.WebViewImplementation.Framework as WebViewImplementationFramework
+}
+component ServiceStudio.Plugin.GuidedTours <<service studio plugin>> as GuidedTours 
+
+
+note top #lightgreen: <b>Tutorials folder</b> with the tutorial created \nwith Steps(c# classes calling the \nvalidations and actions available and \nreact code for the step view).
+GuidedTours -right-> PluginAPIGuidedTour
+GuidedTourPresenter --> PluginAPIGuidedTour
+GuidedTourPresenter <--> GuidedTourController
+note top  #lightgreen: <b>This is the Tutorial Controller layer.</b>\n\n It contains the Actions and Validations that\n interacts with the Service Studio.\n(i.e: Create Screen)
+GuidedTourPresenter --> View 
+GuidedTours --> Framework
+GuidedTourController --> Framework
+View --> ViewImplementationFramework 
+ViewImplementationFramework --> Framework
+PluginAPIGuidedTour --> Framework
+note right #lightgreen: Declare a new tutorial at GuidedTourType(enum)\nDeclare new actions steps at IStepCompletionActionResult(enum)
+@enduml

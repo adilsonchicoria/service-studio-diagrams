@@ -1,0 +1,50 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+Title "User Events and Model Events <<IN PROGRESS>>"
+start
+    :<i><<GuidedTourController>>\n             StartTutorial() ;
+    '    :GuidedTourController.OnNextButtonClicked();
+partition "Event Handling" {    
+    fork 
+        :UserEventHandler;
+        note left: When the user interacts \nwith Tutorial Dialogs or \nwith Service Studio \ncomponents
+        fork again 
+        :ModelEventHandler;    
+        note right: When Service Studio \ncode uses the Model API \nto change the Model
+    end fork
+    :GuidedTourController.OnNext(object );
+    :GuidedTourController.HandleEvent(object);
+}
+
+partition "Validation for the Last Step" {
+    : stepValidationKey = currentStep.GetValidationForEndingStep();
+    if (AllValidations.StepEndingValidationsList.TryGetValue(stepValidationKey, out AbstractValidation validation) ) then (true)
+    note right: When Service Studio \ncode uses the Model API \nto change the Model
+        if (validation is IUserEventValidation) then (true)
+            :validation.onUserEvent();
+        else if (validation is IModelEventValidation) then (true)
+            :validation.onModeEvent();
+        endif
+    endif 
+    
+    :GuidedTourController.AllValidation();
+}
+partition "Action <<DRAFT>>"{
+    :GuidedTourController.Action();
+}
+stop
+
+@enduml
+
+
+@startuml
+
+start
+:step.ExecuteStepStartingAction();
+:step.GetValidationForStartingStep();
+:step.Pointer();
+:step.GetValidationForEndingStep();
+:step.ExecuteStepCompletionAction();
+stop
+
+@enduml

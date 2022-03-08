@@ -1,0 +1,45 @@
+
+@startsalt 
+{+
+    {+
+    
+    }
+    {T
+     + AggregatorWindowPresenter
+     ++ IServerPagePresenter
+     ++ IOutsystemBrowserPresenter
+     ++ <b>aggregators</b> List<IAggregrator>
+     ++++ IAggregrator (module opened as tab)
+     ++++ IAggregrator (module opened as tab)
+     ++++ IAggregrator (module opened as tab)
+     ++++ IAggregrator (module opened as tab)
+    
+    }
+} 
+
+
+@endsalt
+
+@startsalt 
+{+ AggregatorWindowPresenter
+--
+{+
+{* File | Edit | Source | Refactor }
+{/ Forge(IOutsystemBrowserPresenter -> ITopLevelPresenter)| <b> ApplicationList(IServerPagePresenter -> ITopLevelPresenter)/b> | App1(AggregatorPresenter -> ITopLevelPresenter) | App2(AggregatorPresenter -> ITopLevelPresenter) }
+{ 
+    [+ New Application]
+}
+}
+} 
+
+
+@endsalt
+
+@startwbs
+* AggregatorWindowPresenter
+** Forge(IOutsystemBrowserPresenter 
+** ApplicationList(IServerPagePresenter -> ITopLevelPresenter)
+** aggregators List<IAggregator>
+*** App1 (AggregatorPresenter -> ITopLevelPresenter)) 
+*** App2 (AggregatorPresenter -> ITopLevelPresenter)) 
+@endwbs

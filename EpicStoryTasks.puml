@@ -1,0 +1,27 @@
+@startwbs
+*[#yellow] Retain Banking POC 
+**[#pink] <<Epic>>\nCreate your app 
+
+***[#skyblue] <<Story>>\nCreate your app - Open Application Wizard
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Create a StartingStepAction \nOpenApplicationWizardAction 
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Create a EndingStepValidation \nCheckAppNameIsEmptyValidation to check \nif the App Name Input is Empty
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Add unit tests for \nthe Action and Validation
+****[#lightgreen] <<SubTask>>\n Create the Tutorial step
+
+***[#skyblue] <<Story>>\nCreate your app - Create module list validation\n and point to Create App button
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Create a StartingStepValidation \nIsModuleListOpenedValidation  to check \nif the module list (called app on diagram) is opened \nand current app name is not empty
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Unit Tests for Validation
+****[#lightgreen] <<SubTask>>\n Create Tutorial step
+
+***[#skyblue] <<Story>>\nCreate your app - Create and Open Module
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Create and EndingStepAction \nto CreateAndOpenModuleAction 
+****[#lightgreen] <<SubTask>>\n [Infrastructure] Unit Tests
+****[#lightgreen] <<SubTask>>\n Create Tutorial step
+
+**[#pink] <<Epic>>\nCreate Screen 
+***[#skyblue] <<Story>>\nCreate Screen - Select Screen Category
+***[#skyblue] <<Story>>\nCreate Screen - Select Screen 
+***[#skyblue] <<Story>>\nCreate Screen - Create New Screen
+
+
+@endwbs

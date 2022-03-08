@@ -1,0 +1,31 @@
+@startuml
+!include UMLBaseSettings.puml
+
+package OutSystems.GuidedTour.Framework.Actions as FrameworkActions{
+    interface IStepCompletionActionResult {
+        + StepAction InnerActionParameters: 
+        + object InnerActionParameters 
+    }
+    IStepCompletionActionResult <.. IGuidedTourStep
+        
+    enum StepAction {
+        None
+        OpenApplicationModule
+        OpenESpaceTreeTab
+        OpenDialog
+        CheckAllScreensAsAnonymous
+    }        
+    
+    class StepCompletionActionResult
+    IStepCompletionActionResult <|.. StepCompletionActionResult 
+    IStepCompletionActionResult +-- StepAction 
+     
+    abstract AbstractGuidedTourAction <? extends Type> {
+        #Type TopLevelPresenter 
+        #AbstractGuidedTourAction(Type topLevelPresenter)
+        + bool Execute()
+        # <<virtual>> bool InnerExecute()
+    }
+
+}
+@enduml
